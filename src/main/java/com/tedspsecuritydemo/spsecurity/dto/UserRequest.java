@@ -4,9 +4,9 @@ import com.tedspsecuritydemo.spsecurity.model.Role;
 
 import java.util.Set;
 
-public class UserResponse {
+public class UserRequest {
 
-    public UserResponse(){}
+    public UserRequest(){}
 
     public String uname;
     public Set<Role> role;

@@ -1,14 +1,21 @@
 package com.tedspsecuritydemo.spsecurity.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.Set;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name="user")
 public class Users {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private int id;
     @Column(name = "email")
@@ -19,15 +26,14 @@ public class Users {
     private String name;
     @Column(name = "last_name")
     private String lastName;
+
     @Column(name = "active")
     private int active;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-    public Users(){
-    }
     public Users(Users users) {
         this.active = users.getActive();
         this.email = users.getEmail();

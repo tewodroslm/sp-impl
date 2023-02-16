@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,26 +37,24 @@ import java.util.stream.Collectors;
 @EnableJpaRepositories(basePackageClasses = UsersRepository.class)
 @Configuration
 public class SecurityConfigUsingOldWays extends WebSecurityConfigurerAdapter {
+
     // handle it using ss userdetails service
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
-        auth.userDetailsService(userDetailsService).passwordEncoder(getPasswordEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
-    private PasswordEncoder getPasswordEncoder() {
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence charSequence) {
-                return charSequence.toString();
-            }
+    @Bean
+    public static PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
 
-            @Override
-            public boolean matches(CharSequence charSequence, String s) {
-                return true;
-            }
-        };
+
+    @Bean
+    public AuthenticationManager authenticationManagerBean( AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
     @Override
@@ -62,13 +62,28 @@ public class SecurityConfigUsingOldWays extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http
                 .authorizeHttpRequests()
-                    .antMatchers("/", "/user").permitAll()
-                    .anyRequest().authenticated()
-                    .and()
-                .formLogin()
-                    .and()
+                .antMatchers("/api/*").hasAnyRole("USER", "ADMIN", "MANAGER")
+                .antMatchers("/", "/user", "/login", "/register").permitAll()
+                .anyRequest()
+                .authenticated()
+                .and()
                 .httpBasic();
     }
+
+
+//    private PasswordEncoder getPasswordEncoder() {
+//        return new PasswordEncoder() {
+//            @Override
+//            public String encode(CharSequence charSequence) {
+//                return charSequence.toString();
+//            }
+//
+//            @Override
+//            public boolean matches(CharSequence charSequence, String s) {
+//                return true;
+//            }
+//        };
+//    }
 
 //    @Bean
 //    public DataSource dataSource() {
