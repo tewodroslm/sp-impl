@@ -43,6 +43,9 @@ public class SecurityConfigUsingOldWays extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+    @Autowired
+    private CustomAuthenticationProvider customAuthenticationProvider;
+
     @Bean
     protected DaoAuthenticationProvider authProvider(){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
@@ -55,7 +58,8 @@ public class SecurityConfigUsingOldWays extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.authenticationProvider(authProvider());
+        authenticationManagerBuilder.authenticationProvider(authProvider())
+                .authenticationProvider(customAuthenticationProvider);
         return authenticationManagerBuilder.build();
     }
 
