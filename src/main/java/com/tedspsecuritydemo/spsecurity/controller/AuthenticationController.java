@@ -7,6 +7,7 @@ import com.tedspsecuritydemo.spsecurity.model.Role;
 import com.tedspsecuritydemo.spsecurity.model.Users;
 import com.tedspsecuritydemo.spsecurity.repository.UsersRepository;
 import com.tedspsecuritydemo.spsecurity.service.CustomUserDetailsService;
+import com.tedspsecuritydemo.spsecurity.service.auth.AuthenticateService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class AuthenticationController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    AuthenticateService authenticationService;
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody SignUpDto signUpDto) throws Exception {
         log.info("AuthenticationController: registerUser: Entered!");
@@ -70,23 +74,13 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<String> logIn(@RequestBody AuthDto authDto) throws Exception {
         log.info("Login method: Login");
-        log.debug("Credentials : ",authDto);
-//        Authentication authObject = null;
-//
-//        try{
-//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authDto.getUsername(), authDto.getPassword()));
-//            SecurityContextHolder.getContext().setAuthentication(authObject);
-//        } catch (BadCredentialsException e){
-//            throw new Exception("Invalid credentials");
-//        }
 
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authDto.getUsername(), authDto.getPassword()
-        ));
+        Boolean auth = authenticationService.authenticateUser(authDto);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        if(auth) return new ResponseEntity<>("User signed in successfully",HttpStatus.OK);
 
-        return new ResponseEntity<>("User signed in successfully",HttpStatus.OK);
+       return new ResponseEntity<>("Failed to login", HttpStatus.FORBIDDEN);
+
     }
 
 
