@@ -18,7 +18,7 @@ public class AuthenticateService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public Boolean authenticateUser(AuthDto authDto){
+    public String authenticateUser(AuthDto authDto){
         log.info("Inside authenticate Service: {}", authDto);
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 authDto.getUsername(), authDto.getPassword()
@@ -26,11 +26,11 @@ public class AuthenticateService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        log.info("Authenticateion: {}", authentication);
+        log.info("Authentication: {}", authentication.getPrincipal());
         if(authentication != null){
-            return true;
+            return authentication.getName();
         }
-        return false;
+        return null;
     }
 
 }
