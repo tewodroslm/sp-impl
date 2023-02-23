@@ -42,17 +42,6 @@ public class AuthenticationController {
     @Autowired
     AuthenticateService authenticationService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody SignUpDto signUpDto) throws Exception {
-        log.info("AuthenticationController: registerUser: Entered!");
-        log.info("Request Body: ", signUpDto);
-        UserDto u = createUserService.createUser(signUpDto);
-        if(u == null){
-            throw new Exception("Error creating user");
-        }
-        return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
-    }
-
     @PostMapping("/login")
     public ResponseEntity<String> logIn(@RequestBody AuthDto authDto) throws Exception {
         log.info("Login method: Login");
