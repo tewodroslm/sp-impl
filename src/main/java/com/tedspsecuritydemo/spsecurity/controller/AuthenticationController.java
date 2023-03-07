@@ -9,9 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -35,4 +33,18 @@ public class AuthenticationController {
 
        return new ResponseEntity<UserResponse>(HttpStatus.FORBIDDEN);
     }
+
+    @GetMapping("/sign-out")
+    public ResponseEntity<String> logOut(){
+        log.info("Logout Endpoint hit");
+        try{
+           boolean loggedOut = authenticationService.logout();
+           if(loggedOut) return new ResponseEntity<String>("Logged out Success", HttpStatus.OK);
+        }catch (Exception e){
+//            return new ResponseEntity<String>("Logout fail", HttpStatus.BAD_REQUEST);
+            log.error("LogOut Error");
+        }
+        return new ResponseEntity<String>("Logout fail", HttpStatus.BAD_REQUEST);
+    }
+
 }

@@ -27,9 +27,16 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,17 +70,6 @@ public class SecurityConfigUsingOldWays extends WebSecurityConfigurerAdapter {
         return authenticationManagerBuilder.build();
     }
 
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception{
-////        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-//        auth.authenticationProvider(authProvider());
-//    }
-
-//    @Bean
-//    public AuthenticationManager authenticationManagerBean( AuthenticationConfiguration configuration) throws Exception {
-//        return configuration.getAuthenticationManager();
-//    }
-
     @Bean
     public static PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -83,10 +79,9 @@ public class SecurityConfigUsingOldWays extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http
+        http.cors().and()
                 .authorizeHttpRequests()
                 .antMatchers("/api/m1/*").hasRole("ADMIN")
-//                .antMatchers("/api/*").hasAnyRole("USER", "ADMIN", "MANAGER")
                 .antMatchers("/", "/user", "/login").permitAll()
                 .anyRequest()
                 .authenticated()
