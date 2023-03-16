@@ -82,7 +82,7 @@ public class SecurityConfigUsingOldWays extends WebSecurityConfigurerAdapter {
         http.cors().and()
                 .authorizeHttpRequests()
                 .antMatchers("/api/m1/*").hasRole("ADMIN")
-                .antMatchers("/", "/user", "/login").permitAll()
+                .antMatchers("/", "/user", "/login", "/register-user").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
