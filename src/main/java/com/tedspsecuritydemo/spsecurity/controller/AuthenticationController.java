@@ -1,6 +1,8 @@
 package com.tedspsecuritydemo.spsecurity.controller;
 
 import com.tedspsecuritydemo.spsecurity.dto.AuthDto;
+import com.tedspsecuritydemo.spsecurity.dto.SignUpDto;
+import com.tedspsecuritydemo.spsecurity.dto.UserDto;
 import com.tedspsecuritydemo.spsecurity.dto.UserResponse;
 import com.tedspsecuritydemo.spsecurity.model.Users;
 import com.tedspsecuritydemo.spsecurity.service.adminService.CreateUserService;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.Optional;
 
 @Slf4j
@@ -32,6 +35,17 @@ public class AuthenticationController {
         if(auth != null) return new ResponseEntity<UserResponse>( auth,HttpStatus.OK);
 
        return new ResponseEntity<UserResponse>(HttpStatus.FORBIDDEN);
+    }
+
+    @PostMapping("/register-user")
+    public ResponseEntity<?> registerUser(@RequestBody SignUpDto signUpDto) throws Exception {
+        log.info("AuthenticationController: registerUser: Entered!");
+        log.info("Request Body: ", signUpDto);
+        UserDto u = createUserService.createUser(signUpDto);
+        if(u == null){
+            throw new Exception("Error creating user");
+        }
+        return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
     }
 
     @GetMapping("/sign-out")
