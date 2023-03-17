@@ -11,9 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Slf4j
@@ -26,21 +29,24 @@ public class AuthenticationController {
     @Autowired
     AuthenticateService authenticationService;
 
-    @PostMapping("/login")
-    public ResponseEntity<UserResponse> logIn(@RequestBody AuthDto authDto) throws Exception {
+    @PostMapping("/signIn")
+    public ResponseEntity<UserResponse> signIn(@RequestBody AuthDto authDto) throws Exception {
         log.info("Login method: Login");
 
         UserResponse auth = authenticationService.authenticateUser(authDto);
 
         if(auth != null) return new ResponseEntity<UserResponse>( auth,HttpStatus.OK);
 
-       return new ResponseEntity<UserResponse>(HttpStatus.FORBIDDEN);
+       return new ResponseEntity<UserResponse>(HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/register-user")
     public ResponseEntity<?> registerUser(@RequestBody SignUpDto signUpDto) throws Exception {
         log.info("AuthenticationController: registerUser: Entered!");
         log.info("Request Body: ", signUpDto);
+         if(signUpDto.getRole() != "USER"){
+             return new ResponseEntity<>("Can't register as " + signUpDto.getRole(), HttpStatus.BAD_REQUEST);
+         }
         UserDto u = createUserService.createUser(signUpDto);
         if(u == null){
             throw new Exception("Error creating user");
