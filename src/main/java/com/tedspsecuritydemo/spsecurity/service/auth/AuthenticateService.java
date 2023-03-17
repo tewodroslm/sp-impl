@@ -45,19 +45,22 @@ public class AuthenticateService {
 
         log.info("Authentication: {}, {}", authentication.getPrincipal(), authentication.getAuthorities());
 
-        Optional<Users> userResponse = usersRepository.findByName(authentication.getPrincipal().toString());
+        Optional<Users> userResponse = usersRepository.findByEmail(authDto.getUsername());
 
-        UserResponse userResponse1 = UserResponse.builder()
-                .uname(userResponse.get().getName())
-                .lname(userResponse.get().getLastName())
-                .email(userResponse.get().getEmail())
-                .role(userResponse.get().getRoles().stream().map((x) -> x.getRole()).collect(Collectors.toList()))
-                .build();
-        log.info("Full Info : {}", userResponse1);
+        if(!userResponse.isEmpty()){
+            UserResponse userResponse1 = UserResponse.builder()
+                    .uname(userResponse.get().getName())
+                    .lname(userResponse.get().getLastName())
+                    .email(userResponse.get().getEmail())
+                    .role(userResponse.get().getRoles().stream().map((x) -> x.getRole()).collect(Collectors.toList()))
+                    .build();
+            log.info("Full Info : {}", userResponse1);
 
-        if(userResponse1 != null){
-            return userResponse1;
+            if(userResponse1 != null){
+                return userResponse1;
+            }
         }
+
         return null;
     }
 
