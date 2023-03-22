@@ -21,6 +21,8 @@ public class Company {
 
     private String companyName;
 
+    private String location;
+
     @OneToOne
     @JoinColumn(name = "parent_id")
     private Company parent;

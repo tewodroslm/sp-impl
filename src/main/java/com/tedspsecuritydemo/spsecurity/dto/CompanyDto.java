@@ -5,9 +5,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class CompanyResponseDto {
+public class CompanyDto {
 
     public String companyName;
-    public String companyId;
+    public String companyLocation;
 
 }

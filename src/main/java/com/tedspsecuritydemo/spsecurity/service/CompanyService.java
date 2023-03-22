@@ -1,6 +1,6 @@
 package com.tedspsecuritydemo.spsecurity.service;
 
-import com.tedspsecuritydemo.spsecurity.dto.CompanyResponseDto;
+import com.tedspsecuritydemo.spsecurity.dto.CompanyDto;
 import com.tedspsecuritydemo.spsecurity.model.Company;
 import com.tedspsecuritydemo.spsecurity.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +13,13 @@ public class CompanyService {
     CompanyRepository companyRepository;
 
     // create repository
-    public CompanyResponseDto create(String name){
+    public CompanyDto create(CompanyDto companyDto){
         Company company = new Company();
-        company.setCompanyName(name);
+        company.setCompanyName(companyDto.getCompanyName());
+        company.setLocation(companyDto.getCompanyLocation());
         Company company1 = companyRepository.save(company);
-        CompanyResponseDto companyResponseDto = CompanyResponseDto.builder()
-                .companyId(String.valueOf(company1.getId()))
+        CompanyDto companyResponseDto = CompanyDto.builder()
+                .companyLocation(String.valueOf(company1.getLocation()))
                 .companyName(company.getCompanyName())
                 .build();
         return companyResponseDto;
