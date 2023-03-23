@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PaymentRequestDto {
 
-    public String referenceNumber;
-
     public int amount;
 
     public String pay_description;
+
+    public int company_id;
 }
