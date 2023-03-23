@@ -81,8 +81,10 @@ public class SecurityConfigUsingOldWays extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.cors().and()
                 .authorizeHttpRequests()
-                .antMatchers("/api/m1/*").hasRole("ADMIN")
-                .antMatchers("/", "/user", "/login", "/register-user").permitAll()
+                .antMatchers("/api/m1/*",  "/company/api/**").hasRole("ADMIN")
+                .antMatchers( "/company/get").hasAnyRole("USER", "ADMIN", "MANAGER")
+                .antMatchers("/payment/user/**").hasRole("USER")
+                .antMatchers("/", "/signIn", "/register-user").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
