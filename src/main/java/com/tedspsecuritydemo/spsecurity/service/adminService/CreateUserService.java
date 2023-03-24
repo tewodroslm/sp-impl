@@ -4,6 +4,7 @@ import com.tedspsecuritydemo.spsecurity.dto.SignUpDto;
 import com.tedspsecuritydemo.spsecurity.dto.UserDto;
 import com.tedspsecuritydemo.spsecurity.dto.UserRequest;
 import com.tedspsecuritydemo.spsecurity.dto.UserResponse;
+import com.tedspsecuritydemo.spsecurity.model.Manager;
 import com.tedspsecuritydemo.spsecurity.model.Role;
 import com.tedspsecuritydemo.spsecurity.model.Users;
 import com.tedspsecuritydemo.spsecurity.repository.RolesRepository;
@@ -42,6 +43,7 @@ public class CreateUserService {
     public UserDto createUser(SignUpDto signUpDto){
         log.info("Create user service: Entered");
         if(userRepository.existsByEmail(signUpDto.getEmail())){
+            log.error("User Already Exists!");
             return null;
         }
 //        Role role = Role.builder().role(signUpDto.getRole()).build();
@@ -54,18 +56,18 @@ public class CreateUserService {
             role = checkRoleExist(signUpDto.getRole());
         }
         hs.add(role);
-//        user.setRoles(Arrays.asList(role));
-//        userRepository.save(user);
 
-        Users user = Users.builder()
+        Manager user = Manager.builder()
                 .email(signUpDto.getEmail())
                 .name(signUpDto.getName())
                 .active(signUpDto.getActive())
                 .password(passwordEncoder.encode(signUpDto.getPassword()))
                 .lastName(signUpDto.getLastName())
+                .approveLimit(signUpDto.getApproveLimit())
                 .roles(hs)
                 .build();
-        log.debug("User val ==> ", user);
+        log.debug("Manager val ==> ", user);
+
         Users u = userRepository.save(user);
         if(u != null){
             return UserDto.builder()

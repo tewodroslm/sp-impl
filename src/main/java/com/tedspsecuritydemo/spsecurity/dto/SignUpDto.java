@@ -12,4 +12,5 @@ public class SignUpDto {
     private String role;
     private String lastName;
     private int active;
+    private int approveLimit;
 }
