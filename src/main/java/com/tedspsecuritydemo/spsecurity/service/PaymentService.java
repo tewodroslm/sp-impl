@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -46,12 +47,15 @@ public class PaymentService {
         Optional<Company> company = companyRepository.findById(payment.getCompany_id());
 
         int status = 1;
+        List<Users> assignManager = assignManagerForEachPayment(payment.getAmount());
+
         Payment payment1 = Payment.builder()
                 .referenceNumber(payRef)
                 .amount(payment.getAmount())
                 .company(company.orElse(null))
                 .pay_description(payment.getPay_description())
                 .status(status)
+                .users(assignManager)
                 .payeeId(usr.getId())
                         .build();
 
@@ -60,10 +64,13 @@ public class PaymentService {
         PaymentResponseDto paymentResponseDto = returnDto(p);
 
         return paymentResponseDto;
+//        return null;
     }
 
-    private void assignManagerForEachPayment(Payment payment1 ){
-
+    private List<Users> assignManagerForEachPayment(int amount){
+        log.info("INSIDE assignment method");
+        Optional<List<Users>> users = usersRepository.findManagerBasedOnApprovalLimit(amount);
+        return users.orElse(null);
     }
 
     private PaymentResponseDto returnDto(Payment p){
