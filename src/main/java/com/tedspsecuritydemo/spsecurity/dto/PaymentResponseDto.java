@@ -1,14 +1,18 @@
 package com.tedspsecuritydemo.spsecurity.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentResponseDto {
 
-    int paymentId;
-    String paymentDescription;
+    int id;
+    String pay_description;
 
     String status;
     String referenceNumber;

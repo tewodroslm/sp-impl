@@ -1,6 +1,7 @@
 package com.tedspsecuritydemo.spsecurity.model;
 
 
+import com.tedspsecuritydemo.spsecurity.dto.PaymentResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,8 +13,8 @@ import java.util.List;
 
 @Builder
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Payment {
 

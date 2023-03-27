@@ -3,6 +3,7 @@ package com.tedspsecuritydemo.spsecurity.service;
 import com.tedspsecuritydemo.spsecurity.config.StatusEnum;
 import com.tedspsecuritydemo.spsecurity.dto.PaymentRequestDto;
 import com.tedspsecuritydemo.spsecurity.dto.PaymentResponseDto;
+import com.tedspsecuritydemo.spsecurity.dto.mapper.PaymentPaymentResponseDtoMapper;
 import com.tedspsecuritydemo.spsecurity.model.Company;
 import com.tedspsecuritydemo.spsecurity.model.Payment;
 import com.tedspsecuritydemo.spsecurity.model.Users;
@@ -10,12 +11,14 @@ import com.tedspsecuritydemo.spsecurity.repository.CompanyRepository;
 import com.tedspsecuritydemo.spsecurity.repository.PaymentRepository;
 import com.tedspsecuritydemo.spsecurity.repository.UsersRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +34,8 @@ public class PaymentService {
 
     @Autowired
     private CompanyRepository companyRepository;
+
+    private PaymentPaymentResponseDtoMapper paymentPaymentResponseDtoMapper = Mappers.getMapper(PaymentPaymentResponseDtoMapper.class);
 
     public PaymentResponseDto initiatePayment(PaymentRequestDto payment){
         log.info("Payment service initiate payment!");
@@ -93,12 +98,21 @@ public class PaymentService {
                 break;
         }
         return  PaymentResponseDto.builder()
-                .paymentId(p.getId())
-                .paymentDescription(p.getPay_description())
+                .id(p.getId())
+                .pay_description(p.getPay_description())
                 .amount(p.getAmount())
                 .referenceNumber(p.getReferenceNumber())
                 .status(paymentStatus)
                 .build();
+    }
+
+    public List<PaymentResponseDto> getAllPayment(){
+        log.info("Get All Payment");
+        List<Payment> payments = paymentRepository.findAllPayment();
+
+        List<PaymentResponseDto> paymentResponseDtos = paymentPaymentResponseDtoMapper.getAll(payments);
+
+        return paymentResponseDtos;
     }
 
 

@@ -4,11 +4,12 @@ import com.tedspsecuritydemo.spsecurity.dto.PaymentRequestDto;
 import com.tedspsecuritydemo.spsecurity.dto.PaymentResponseDto;
 import com.tedspsecuritydemo.spsecurity.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -40,10 +41,25 @@ public class PaymentController {
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
-    // retrieve all payment
+    // retrieve all payment as a Manager
+    @GetMapping("manager/get")
+    public ResponseEntity<?> getAllPayments(){
+        log.info("Inside of Get All Payment -> Manger role");
+
+        List<PaymentResponseDto> paymentResponseDto = paymentService.getAllPayment();
+
+        return new ResponseEntity<List<PaymentResponseDto>>(paymentResponseDto, HttpStatus.OK);
+    }
+
+
 
 
 }
+
+
+
+
+
 
 //+------------------+--------------+------+-----+---------+----------------+
 //| Field            | Type         | Null | Key | Default | Extra          |
