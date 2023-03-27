@@ -115,6 +115,11 @@ public class PaymentService {
         return paymentResponseDtos;
     }
 
+    public List<PaymentResponseDto> getMyPayment(String uId){
+        List<Payment> payments = paymentRepository.findMyPayments(Integer.parseInt(uId));
+        List<PaymentResponseDto> paymentResponseDtos = paymentPaymentResponseDtoMapper.getAll(payments);
+        return paymentResponseDtos;
+    }
 
 }
 

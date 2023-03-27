@@ -43,6 +43,7 @@ public class PaymentController {
 
     // retrieve all payment as a Manager
     @GetMapping("manager/get")
+    @ResponseBody
     public ResponseEntity<?> getAllPayments(){
         log.info("Inside of Get All Payment -> Manger role");
 
@@ -52,7 +53,14 @@ public class PaymentController {
     }
 
 
+    @GetMapping("user/get")
+    public ResponseEntity<?> getMyPayments(@RequestParam String userId){
+        log.info("Inside of Get MY PaYMents");
 
+        List<PaymentResponseDto> paymentResponseDtos = paymentService.getMyPayment(userId);
+
+        return new ResponseEntity<>(paymentResponseDtos, HttpStatus.OK);
+    }
 
 }
 
