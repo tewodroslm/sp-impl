@@ -46,12 +46,13 @@ public class AuthenticateService {
         log.info("Authentication: {}, {}", authentication.getPrincipal(), authentication.getAuthorities());
 
         Optional<Users> userResponse = usersRepository.findByEmail(authDto.getUsername());
-
+        log.info(userResponse.toString());
         if(!userResponse.isEmpty()){
             UserResponse userResponse1 = UserResponse.builder()
                     .uname(userResponse.get().getName())
                     .lname(userResponse.get().getLastName())
                     .email(userResponse.get().getEmail())
+                    .uId(userResponse.get().getId())
                     .role(userResponse.get().getRoles().stream().map((x) -> x.getRole()).collect(Collectors.toList()))
                     .build();
             log.info("Full Info : {}", userResponse1);
