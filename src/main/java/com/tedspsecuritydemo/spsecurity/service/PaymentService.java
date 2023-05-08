@@ -15,8 +15,10 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,7 @@ public class PaymentService {
     public PaymentResponseDto initiatePayment(PaymentRequestDto payment){
         log.info("Payment service initiate payment!");
         Authentication user = SecurityContextHolder.getContext().getAuthentication();
-        Users usr = usersRepository.findByName(user.getName());
+        Optional<Users> usr = usersRepository.findByName(user.getName());
 
         // generate reference number -- 11 digit unique
         // ad-time
@@ -61,7 +63,7 @@ public class PaymentService {
                 .pay_description(payment.getPay_description())
                 .status(status)
                 .users(assignManager)
-                .payeeId(usr.getId())
+                .payeeId(usr.get().getId())
                         .build();
 
         // save payment
@@ -116,6 +118,12 @@ public class PaymentService {
     }
 
     public List<PaymentResponseDto> getMyPayment(String uId){
+
+        Authentication user = SecurityContextHolder.getContext().getAuthentication();
+        Optional<Users> usr = usersRepository.findByName(user.getName());
+
+        if(usr.orElseThrow().getId()  != Integer.parseInt(uId)) return null;
+
         List<Payment> payments = paymentRepository.findMyPayments(Integer.parseInt(uId));
         List<PaymentResponseDto> paymentResponseDtos = paymentPaymentResponseDtoMapper.getAll(payments);
         return paymentResponseDtos;

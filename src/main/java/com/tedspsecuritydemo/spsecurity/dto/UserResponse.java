@@ -16,5 +16,16 @@ public class UserResponse {
     public String lname;
     public List<String> role;
     public String email;
+    public int uId;
 
+    @Override
+    public String toString() {
+        return "UserResponse{" +
+                "uname='" + uname + '\'' +
+                ", lname='" + lname + '\'' +
+                ", role=" + role +
+                ", email='" + email + '\'' +
+                ", userId='" + uId + '\'' +
+                '}';
+    }
 }
