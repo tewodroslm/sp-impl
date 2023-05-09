@@ -1,5 +1,6 @@
 package com.tedspsecuritydemo.spsecurity.controller;
 
+import com.tedspsecuritydemo.spsecurity.dto.PaymentActionRequestDto;
 import com.tedspsecuritydemo.spsecurity.dto.PaymentRequestDto;
 import com.tedspsecuritydemo.spsecurity.dto.PaymentResponseDto;
 import com.tedspsecuritydemo.spsecurity.service.PaymentService;
@@ -58,9 +59,24 @@ public class PaymentController {
         log.info("Inside of Get MY PaYMents");
 
         List<PaymentResponseDto> paymentResponseDtos = paymentService.getMyPayment(userId);
+        log.info(paymentResponseDtos.toString());
+        if(paymentResponseDtos == null) return new ResponseEntity<>("Error", HttpStatus.FORBIDDEN);
 
         return new ResponseEntity<>(paymentResponseDtos, HttpStatus.OK);
     }
+
+    // Approve Payment(Manager Only
+    // payment -> update payment status
+    @PostMapping(value="manager/action",   produces = "application/json")
+    public ResponseEntity<?> applyActionOnPayment(@RequestBody PaymentActionRequestDto paymentActionRequestDto){
+        log.info("Inside applyActionOnPayment method");
+        log.info(paymentActionRequestDto.toString());
+        String sol = paymentService.applyActionMangerRo(paymentActionRequestDto.getActionStatus(), paymentActionRequestDto.getPaymentId());
+        System.out.println("########### Sol is Not Impty ####### "+ sol);
+        paymentActionRequestDto.setActionStatus(sol);
+        return new ResponseEntity<>(paymentActionRequestDto, HttpStatus.OK);
+    }
+
 
 }
 

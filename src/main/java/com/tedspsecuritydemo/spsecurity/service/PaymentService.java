@@ -1,6 +1,7 @@
 package com.tedspsecuritydemo.spsecurity.service;
 
 import com.tedspsecuritydemo.spsecurity.config.StatusEnum;
+import com.tedspsecuritydemo.spsecurity.dto.PaymentActionRequestDto;
 import com.tedspsecuritydemo.spsecurity.dto.PaymentRequestDto;
 import com.tedspsecuritydemo.spsecurity.dto.PaymentResponseDto;
 import com.tedspsecuritydemo.spsecurity.dto.mapper.PaymentPaymentResponseDtoMapper;
@@ -127,6 +128,36 @@ public class PaymentService {
         List<Payment> payments = paymentRepository.findMyPayments(Integer.parseInt(uId));
         List<PaymentResponseDto> paymentResponseDtos = paymentPaymentResponseDtoMapper.getAll(payments);
         return paymentResponseDtos;
+    }
+
+    public String applyActionMangerRo(String action, Integer paymentId){
+        log.info("Inside applyActionMangerRo");
+
+        // get payment by Id ... change status of that payment ... return success or fail
+        Payment payment = paymentRepository.findById(paymentId).orElse(null);
+        if(payment == null) return "no payment found.";
+        int stTs;
+        switch (action){
+            case "INITIATED":
+                stTs = 1;
+                break;
+            case "ON_HOLD":
+                stTs = 2;
+                break;
+            case "CANCELED":
+                stTs = 3;
+                break;
+            case "APPROVED":
+                stTs = 4;
+                break;
+            default:
+                stTs = 5;
+                break;
+        }
+        payment.setStatus(stTs);
+        paymentRepository.save(payment);
+//        paymentRepository.updatePayment(paymentId, stTs);
+        return new String("Success");
     }
 
 }
