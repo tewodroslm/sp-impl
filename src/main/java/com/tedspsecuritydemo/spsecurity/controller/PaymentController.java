@@ -39,7 +39,7 @@ public class PaymentController {
 
         PaymentResponseDto paymentResponseDto = paymentService.initiatePayment(paymentRequestDto);
 
-        return new ResponseEntity<>("success", HttpStatus.OK);
+        return new ResponseEntity<>(paymentResponseDto, HttpStatus.OK);
     }
 
     // retrieve all payment as a Manager
