@@ -85,6 +85,7 @@ public class SecurityConfigUsingOldWays extends WebSecurityConfigurerAdapter {
                 .antMatchers( "/company/get").hasAnyRole("USER", "ADMIN", "MANAGER")
                 .antMatchers("/payment/user/**").hasRole("USER")
                 .antMatchers("/payment/manager/**").hasRole("MANAGER")
+                .antMatchers("/payment/action").hasAnyRole("MANAGER", "USER")
                 .antMatchers("/", "/signIn", "/register-user").permitAll()
                 .anyRequest()
                 .authenticated()

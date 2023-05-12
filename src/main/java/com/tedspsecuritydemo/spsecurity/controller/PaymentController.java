@@ -67,12 +67,14 @@ public class PaymentController {
 
     // Approve Payment(Manager Only
     // payment -> update payment status
-    @PostMapping(value="manager/action",   produces = "application/json")
+    @PostMapping(value="action",   produces = "application/json")
     public ResponseEntity<?> applyActionOnPayment(@RequestBody PaymentActionRequestDto paymentActionRequestDto){
         log.info("Inside applyActionOnPayment method");
         log.info(paymentActionRequestDto.toString());
         String sol = paymentService.applyActionMangerRo(paymentActionRequestDto.getActionStatus(), paymentActionRequestDto.getPaymentId());
         System.out.println("########### Sol is Not Impty ####### "+ sol);
+//        if(sol.compareTo("Success")){}
+        sol.concat(" - Action applied.");
         paymentActionRequestDto.setActionStatus(sol);
         return new ResponseEntity<>(paymentActionRequestDto, HttpStatus.OK);
     }
