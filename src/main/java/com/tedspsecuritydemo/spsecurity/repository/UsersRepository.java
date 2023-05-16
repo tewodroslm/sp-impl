@@ -1,10 +1,13 @@
 package com.tedspsecuritydemo.spsecurity.repository;
 
+import com.tedspsecuritydemo.spsecurity.dto.UserDto;
+import com.tedspsecuritydemo.spsecurity.dto.UserResponse;
 import com.tedspsecuritydemo.spsecurity.model.CustomUserDetails;
 import com.tedspsecuritydemo.spsecurity.model.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -19,6 +22,18 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
     Boolean existsByEmail(String email);
 
 //    Users findByName(String name);
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT * FROM user u WHERE u.dtype=:rl"
+    )
+    List<Users> getMUsers(@Param("rl") String u);
+
+//    @Query(
+//            nativeQuery = true,
+//            value =  "SELECT * FROM user u WHERE u.dtype='Manager'"   Users
+//    )
+//    List<Users> getManagers();
 
     @Transactional
     @Query(

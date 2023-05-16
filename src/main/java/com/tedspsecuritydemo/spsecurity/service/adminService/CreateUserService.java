@@ -1,9 +1,9 @@
 package com.tedspsecuritydemo.spsecurity.service.adminService;
 
-import com.tedspsecuritydemo.spsecurity.dto.SignUpDto;
-import com.tedspsecuritydemo.spsecurity.dto.UserDto;
-import com.tedspsecuritydemo.spsecurity.dto.UserRequest;
-import com.tedspsecuritydemo.spsecurity.dto.UserResponse;
+import com.tedspsecuritydemo.spsecurity.dto.*;
+import com.tedspsecuritydemo.spsecurity.dto.mapper.PaymentPaymentResponseDtoMapper;
+import com.tedspsecuritydemo.spsecurity.dto.mapper.UserResponseDtoMapper;
+import com.tedspsecuritydemo.spsecurity.dto.mapper.mapperImp.UserResponseDtoMapperImp;
 import com.tedspsecuritydemo.spsecurity.model.Manager;
 import com.tedspsecuritydemo.spsecurity.model.Role;
 import com.tedspsecuritydemo.spsecurity.model.Users;
@@ -11,16 +11,17 @@ import com.tedspsecuritydemo.spsecurity.repository.RolesRepository;
 import com.tedspsecuritydemo.spsecurity.repository.UsersRepository;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -39,6 +40,9 @@ public class CreateUserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private UserResponseDtoMapper userResponseDtoMapper = Mappers.getMapper(UserResponseDtoMapper.class);
+
+
     // create user
     public UserDto createUser(SignUpDto signUpDto){
         log.info("Create user service: Entered");
@@ -51,24 +55,40 @@ public class CreateUserService {
         Role role = rolesRepository.findByRole(signUpDto.getRole());
 
         Set<Role> hs = new HashSet<>();
-        log.info("ROle --> ", role);
         if(role == null){
             role = checkRoleExist(signUpDto.getRole());
         }
         hs.add(role);
+        Users u;
 
-        Manager user = Manager.builder()
-                .email(signUpDto.getEmail())
-                .name(signUpDto.getName())
-                .active(signUpDto.getActive())
-                .password(passwordEncoder.encode(signUpDto.getPassword()))
-                .lastName(signUpDto.getLastName())
-                .approveLimit(signUpDto.getApproveLimit())
-                .roles(hs)
-                .build();
-        log.debug("Manager val ==> ", user);
+        if(signUpDto.getRole().equals("MANAGER")){
+            log.info("Creating Manager");
+            Manager user = Manager.builder()
+                    .email(signUpDto.getEmail())
+                    .name(signUpDto.getName())
+                    .active(signUpDto.getActive())
+                    .password(passwordEncoder.encode(signUpDto.getPassword()))
+                    .lastName(signUpDto.getLastName())
+                    .approveLimit(signUpDto.getApproveLimit())
+                    .roles(hs)
+                    .build();
+            u = userRepository.save(user);
+        }else {
+            log.info("Creating User");
 
-        Users u = userRepository.save(user);
+            Users user = Users.builder()
+                    .email(signUpDto.getEmail())
+                    .name(signUpDto.getName())
+                    .active(signUpDto.getActive())
+                    .password(passwordEncoder.encode(signUpDto.getPassword()))
+                    .lastName(signUpDto.getLastName())
+                    .roles(hs)
+                    .build();
+            log.debug("User val ==> ", user);
+            u = userRepository.save(user);
+
+        }
+
         if(u != null){
             return UserDto.builder()
                     .uname(u.getName())
@@ -85,5 +105,20 @@ public class CreateUserService {
         return rolesRepository.save(role);
     }
 
+    public List<UserResponse> getAllBasicUsers(){
+        List<Users> u = userRepository.getMUsers("Users");
+        List<UserResponse> userResponses = userResponseDtoMapper.getBasicUser(u);
+        return userResponses;
+    }
+
+    public List<ManagerResponse> getAllManager(){
+        List<Users> u = userRepository.getMUsers("Manager");
+        List<Manager> m = new ArrayList<>();
+        for(Users us : u){
+            m.add((Manager) us);
+        }
+        List<ManagerResponse> userResponses = userResponseDtoMapper.getManagers(m);
+        return userResponses;
+    }
 
 }

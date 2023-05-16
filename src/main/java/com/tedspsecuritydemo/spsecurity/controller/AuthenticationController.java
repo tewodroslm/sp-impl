@@ -34,6 +34,8 @@ public class AuthenticationController {
         log.info("Login method: Login");
 
         UserResponse auth = authenticationService.authenticateUser(authDto);
+        System.out.println("******* Logged in User Status *****");
+        System.out.println(auth.toString());
 
         if(auth != null) return new ResponseEntity<UserResponse>( auth,HttpStatus.OK);
 
@@ -44,14 +46,15 @@ public class AuthenticationController {
     public ResponseEntity<?> registerUser(@RequestBody SignUpDto signUpDto) throws Exception {
         log.info("AuthenticationController: registerUser: Entered!");
         log.info("Request Body: ", signUpDto);
-         if(signUpDto.getRole() != "USER"){
+        System.out.println("######## "+ signUpDto.getRole());
+         if(!signUpDto.getRole().equals("USER")){
              return new ResponseEntity<>("Can't register as " + signUpDto.getRole(), HttpStatus.BAD_REQUEST);
          }
         UserDto u = createUserService.createUser(signUpDto);
         if(u == null){
-            throw new Exception("Error creating user");
+            return new ResponseEntity<>(new Exception("Error creating user"), HttpStatus.OK);
         }
-        return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
+        return new ResponseEntity<>(u, HttpStatus.OK);
     }
 
     @GetMapping("/sign-out")

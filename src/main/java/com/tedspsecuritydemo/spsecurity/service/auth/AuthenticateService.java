@@ -3,6 +3,7 @@ package com.tedspsecuritydemo.spsecurity.service.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tedspsecuritydemo.spsecurity.dto.AuthDto;
 import com.tedspsecuritydemo.spsecurity.dto.UserResponse;
+import com.tedspsecuritydemo.spsecurity.model.Role;
 import com.tedspsecuritydemo.spsecurity.model.Users;
 import com.tedspsecuritydemo.spsecurity.repository.UsersRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -47,13 +48,14 @@ public class AuthenticateService {
 
         Optional<Users> userResponse = usersRepository.findByEmail(authDto.getUsername());
         log.info(userResponse.toString());
+        List<Role> roleList = new ArrayList<>(userResponse.orElse(null).getRoles());
         if(!userResponse.isEmpty()){
             UserResponse userResponse1 = UserResponse.builder()
-                    .uname(userResponse.get().getName())
-                    .lname(userResponse.get().getLastName())
+                    .name(userResponse.get().getName())
+                    .lastName(userResponse.get().getLastName())
                     .email(userResponse.get().getEmail())
-                    .uId(userResponse.get().getId())
-                    .role(userResponse.get().getRoles().stream().map((x) -> x.getRole()).collect(Collectors.toList()))
+                    .id(userResponse.get().getId())
+                    .roles(roleList)
                     .build();
             log.info("Full Info : {}", userResponse1);
 
