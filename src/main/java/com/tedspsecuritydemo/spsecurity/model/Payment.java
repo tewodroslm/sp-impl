@@ -1,18 +1,19 @@
 package com.tedspsecuritydemo.spsecurity.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tedspsecuritydemo.spsecurity.dto.PaymentResponseDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -27,9 +28,15 @@ public class Payment {
 
     private int amount;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "payment_user", joinColumns = @JoinColumn(name = "payment_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<Users> users;
+    @ManyToMany(fetch = FetchType.EAGER,
+          cascade = {
+              CascadeType.PERSIST,
+              CascadeType.MERGE
+          },
+          mappedBy = "payments")
+     @JsonIgnore
+     private Set<Users> users = new HashSet<>();
+
 
     @ManyToOne
     @JoinColumn(name = "company_id", nullable = false)
@@ -75,88 +82,3 @@ public class Payment {
         // payment report ...
 
  */
-
-//package net.codejava;
-//
-//import java.util.*;
-//
-//import javax.persistence.*;
-//
-//@Entity
-//@Table
-//public class Category {
-//    @Id
-//    @Column(name = "category_id")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Integer id;
-//
-//    @Column(length = 64)
-//    private String name;
-//
-//    @OneToOne
-//    @JoinColumn(name = "parent_id")
-//    private Category parent;
-//
-//    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-//    private Set<Category> children = new HashSet<>();
-//
-//    public Category(String name, Category parent) {
-//        this.name = name;
-//        this.parent = parent;
-//    }
-//
-//    public Category(String name) {
-//        this.name = name;
-//    }
-//
-//    public Category() {
-//    }
-//
-//    public Integer getId() {
-//        return id;
-//    }
-//
-//    public void setId(Integer id) {
-//        this.id = id;
-//    }
-//
-//    public String getName() {
-//        return name;
-//    }
-//
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-//
-//    public Category getParent() {
-//        return parent;
-//    }
-//
-//    public void setParent(Category parent) {
-//        this.parent = parent;
-//    }
-//
-//    public Set<Category> getChildren() {
-//        return children;
-//    }
-//
-//    public void setChildren(Set<Category> children) {
-//        this.children = children;
-//    }
-//
-//    public void addChild(Category children) {
-//        this.children.add(children);
-//    }
-//}
-
-
-
-
-
-
-
-
-
-
-
-

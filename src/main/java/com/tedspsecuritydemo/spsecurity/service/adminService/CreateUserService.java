@@ -1,26 +1,25 @@
 package com.tedspsecuritydemo.spsecurity.service.adminService;
 
 import com.tedspsecuritydemo.spsecurity.dto.*;
-import com.tedspsecuritydemo.spsecurity.dto.mapper.PaymentPaymentResponseDtoMapper;
 import com.tedspsecuritydemo.spsecurity.dto.mapper.UserResponseDtoMapper;
-import com.tedspsecuritydemo.spsecurity.dto.mapper.mapperImp.UserResponseDtoMapperImp;
 import com.tedspsecuritydemo.spsecurity.model.Manager;
+import com.tedspsecuritydemo.spsecurity.model.Payment;
 import com.tedspsecuritydemo.spsecurity.model.Role;
 import com.tedspsecuritydemo.spsecurity.model.Users;
+import com.tedspsecuritydemo.spsecurity.repository.PaymentRepository;
 import com.tedspsecuritydemo.spsecurity.repository.RolesRepository;
 import com.tedspsecuritydemo.spsecurity.repository.UsersRepository;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 
 @Service
@@ -33,6 +32,9 @@ public class CreateUserService {
 
     @Autowired
     private UsersRepository userRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private RolesRepository rolesRepository;
@@ -112,13 +114,22 @@ public class CreateUserService {
     }
 
     public List<ManagerResponse> getAllManager(){
+        log.info("Service: get all manager");
+
         List<Users> u = userRepository.getMUsers("Manager");
+        log.info(u.toString());
         List<Manager> m = new ArrayList<>();
         for(Users us : u){
             m.add((Manager) us);
         }
         List<ManagerResponse> userResponses = userResponseDtoMapper.getManagers(m);
         return userResponses;
+    }
+
+    public Users deleteAgent(String id) throws Exception{
+        Users user = userRepository.findById(Integer.parseInt(id)).orElseThrow(() -> new Exception("User not found"));
+        userRepository.delete(user);
+        return user;
     }
 
 }

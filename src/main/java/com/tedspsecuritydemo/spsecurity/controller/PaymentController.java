@@ -36,10 +36,13 @@ public class PaymentController {
            - reference number 9 digit unique alphanumeric
            - status initially should be 'initiated'
          */
+        try{
+            PaymentResponseDto paymentResponseDto = paymentService.initiatePayment(paymentRequestDto);
+            return new ResponseEntity<>(paymentResponseDto, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e, HttpStatus.NOT_MODIFIED);
+        }
 
-        PaymentResponseDto paymentResponseDto = paymentService.initiatePayment(paymentRequestDto);
-
-        return new ResponseEntity<>(paymentResponseDto, HttpStatus.OK);
     }
 
     // retrieve all payment as a Manager

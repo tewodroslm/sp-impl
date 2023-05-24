@@ -21,9 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -40,7 +38,7 @@ public class PaymentService {
 
     private PaymentPaymentResponseDtoMapper paymentPaymentResponseDtoMapper = Mappers.getMapper(PaymentPaymentResponseDtoMapper.class);
 
-    public PaymentResponseDto initiatePayment(PaymentRequestDto payment){
+    public PaymentResponseDto initiatePayment(PaymentRequestDto payment) throws Exception{
         log.info("Payment service initiate payment!");
         Authentication user = SecurityContextHolder.getContext().getAuthentication();
         Optional<Users> usr = usersRepository.findByName(user.getName());
@@ -55,7 +53,7 @@ public class PaymentService {
         Optional<Company> company = companyRepository.findById(payment.getCompany_id());
 
         int status = 1;
-        List<Users> assignManager = assignManagerForEachPayment(payment.getAmount());
+        Set<Users> assignManager = assignManagerForEachPayment(payment.getAmount());
 
         Payment payment1 = Payment.builder()
                 .referenceNumber(payRef)
@@ -75,10 +73,12 @@ public class PaymentService {
 //        return null;
     }
 
-    private List<Users> assignManagerForEachPayment(int amount){
+    private Set<Users> assignManagerForEachPayment(int amount) throws Exception{
         log.info("INSIDE assignment method");
-        Optional<List<Users>> users = usersRepository.findManagerBasedOnApprovalLimit(amount);
-        return users.orElse(null);
+        List<Users> users = usersRepository.findManagerBasedOnApprovalLimit(amount).orElseThrow(() -> new Exception("Error"));
+        Set<Users> usersSet = new HashSet<>();
+        usersSet.addAll(users);
+        return usersSet;
     }
 
     private PaymentResponseDto returnDto(Payment p){

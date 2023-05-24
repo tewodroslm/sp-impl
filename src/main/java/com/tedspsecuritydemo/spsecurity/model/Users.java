@@ -1,16 +1,18 @@
 package com.tedspsecuritydemo.spsecurity.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name="user")
 public class Users {
@@ -31,9 +33,47 @@ public class Users {
     @Column(name = "active")
     private int active;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    @ManyToMany(cascade = {
+                CascadeType.PERSIST, CascadeType.MERGE
+            },
+            fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn (name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST, CascadeType.MERGE
+    },
+            fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_payment",
+            joinColumns = @JoinColumn (name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "payment_id"))
+    private Set<Payment> payments = new HashSet<>();
+
+    public void addPayment(Payment u) {
+        this.payments.add(u);
+        u.getUsers().add(this);
+    }
+
+    public void removePayment(long tagId) {
+        Payment payment = this.payments.stream().filter(t -> t.getId() == tagId).findFirst().orElse(null);
+        if (payment != null) {
+          this.payments.remove(payment);
+          payment.getUsers().remove(this);
+        }
+    }
+
+    public Set<Payment> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(Set<Payment> payments) {
+        this.payments = payments;
+    }
+
 
     public Users(Users users) {
         this.active = users.getActive();
@@ -44,60 +84,10 @@ public class Users {
         this.id = users.getId();
         this.password = users.getPassword();
     }
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public int getActive() {
-        return active;
-    }
-
-    public void setActive(int active) {
-        this.active = active;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void removeRole(Role role){
+        this.roles.remove(role);
+        role.getUsers().remove(this);
     }
 
 }
