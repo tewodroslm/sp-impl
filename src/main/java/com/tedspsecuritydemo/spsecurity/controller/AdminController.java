@@ -21,7 +21,7 @@ public class AdminController {
     private CreateUserService createUserService;
 
     @GetMapping("/managers")
-    public ResponseEntity<?> getBasicUsers(){
+    public ResponseEntity<?> getManagers(){
         log.info("Get Agent Users: Manager");
         List<ManagerResponse> users = createUserService.getAllManager();
         log.info(users.toString());
