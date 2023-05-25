@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -20,22 +21,18 @@ public class CompanyController {
     @Autowired
     CompanyService companyService;
 
-    // create new
     @PostMapping("api/create-company")
-    public ResponseEntity<CompanyDto> createCompany(@RequestBody CompanyDto company){
+    public ResponseEntity<?> createCompany(@RequestBody @Validated CompanyDto company){
         log.info("Inside Company Controller");
         // create service
-        CompanyDto companyResponseDto = null;
-        if(company != null){
-            companyResponseDto = companyService.create(company);
-            if(companyResponseDto == null){
-                return new ResponseEntity<CompanyDto>((CompanyDto) null, HttpStatus.BAD_REQUEST);
-            }
+        CompanyDto companyResponseDto = companyService.create(company);
+        if(companyResponseDto == null){
+            return new ResponseEntity<>(new Exception("Company not created"), HttpStatus.BAD_REQUEST);
         }
+
         return new ResponseEntity<>(companyResponseDto ,HttpStatus.OK);
     }
 
-    // get All
     @GetMapping("get")
     public ResponseEntity<List<Company>> getAllCompany(){
         List<Company> company = companyService.getAll();
