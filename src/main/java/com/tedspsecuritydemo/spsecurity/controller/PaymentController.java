@@ -8,8 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -22,7 +24,7 @@ public class PaymentController {
 
     // create a payment by User only
     @PostMapping("user/create")
-    public ResponseEntity<?> createPayment(@RequestBody PaymentRequestDto paymentRequestDto){
+    public ResponseEntity<?> createPayment(@RequestBody @Validated PaymentRequestDto paymentRequestDto){
 
         log.info("Inside Create payment : PaymentController");
 
@@ -36,13 +38,14 @@ public class PaymentController {
            - reference number 9 digit unique alphanumeric
            - status initially should be 'initiated'
          */
+        PaymentResponseDto paymentResponseDto;
         try{
-            PaymentResponseDto paymentResponseDto = paymentService.initiatePayment(paymentRequestDto);
-            return new ResponseEntity<>(paymentResponseDto, HttpStatus.OK);
+            paymentResponseDto = paymentService.initiatePayment(paymentRequestDto);
         }catch (Exception e){
             return new ResponseEntity<>(e, HttpStatus.NOT_MODIFIED);
         }
 
+        return new ResponseEntity<>(paymentResponseDto, HttpStatus.OK);
     }
 
     // retrieve all payment as a Manager
@@ -63,7 +66,7 @@ public class PaymentController {
 
         List<PaymentResponseDto> paymentResponseDtos = paymentService.getMyPayment(userId);
         log.info(paymentResponseDtos.toString());
-        if(paymentResponseDtos == null) return new ResponseEntity<>("Error", HttpStatus.FORBIDDEN);
+        if(paymentResponseDtos.isEmpty()) return new ResponseEntity<>(new Exception("No Payment"), HttpStatus.NO_CONTENT);
 
         return new ResponseEntity<>(paymentResponseDtos, HttpStatus.OK);
     }
@@ -71,13 +74,12 @@ public class PaymentController {
     // Approve Payment(Manager Only
     // payment -> update payment status
     @PostMapping(value="action",   produces = "application/json")
-    public ResponseEntity<?> applyActionOnPayment(@RequestBody PaymentActionRequestDto paymentActionRequestDto){
+    public ResponseEntity<?> applyActionOnPayment(@RequestBody @Validated PaymentActionRequestDto paymentActionRequestDto){
         log.info("Inside applyActionOnPayment method");
         log.info(paymentActionRequestDto.toString());
         String sol = paymentService.applyActionMangerRo(paymentActionRequestDto.getActionStatus(), paymentActionRequestDto.getPaymentId());
-        System.out.println("########### Sol is Not Impty ####### "+ sol);
-//        if(sol.compareTo("Success")){}
-        sol.concat(" - Action applied.");
+
+        sol += " - Action applied.";
         paymentActionRequestDto.setActionStatus(sol);
         return new ResponseEntity<>(paymentActionRequestDto, HttpStatus.OK);
     }
