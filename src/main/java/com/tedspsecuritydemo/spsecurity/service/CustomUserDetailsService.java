@@ -18,19 +18,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private UsersRepository userRepository;
 
-    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        log.info("Custom User Details Service .." + name);
-        Optional<Users> optionalUsers = userRepository.findByName(name);
-        optionalUsers
-                .orElseThrow(() -> new UsernameNotFoundException("User name not found"));
-        return optionalUsers.map(CustomUserDetails::new).get();
-    }
-
-    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
-        log.info("Custom User Details Service loadUserByEmail ..");
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        log.info("Custom User Details Service .." + email);
         Optional<Users> optionalUsers = userRepository.findByEmail(email);
         optionalUsers
                 .orElseThrow(() -> new UsernameNotFoundException("User name not found"));
         return optionalUsers.map(CustomUserDetails::new).get();
     }
+
 }

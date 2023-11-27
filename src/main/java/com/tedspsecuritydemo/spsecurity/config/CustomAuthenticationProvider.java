@@ -1,9 +1,7 @@
 package com.tedspsecuritydemo.spsecurity.config;
 
-import com.mysql.cj.conf.PropertySet;
-import com.mysql.cj.exceptions.ExceptionInterceptor;
-import com.mysql.cj.protocol.Protocol;
-import com.tedspsecuritydemo.spsecurity.model.CustomUserDetails;
+import com.tedspsecuritydemo.spsecurity.model.Users;
+import com.tedspsecuritydemo.spsecurity.repository.UsersRepository;
 import com.tedspsecuritydemo.spsecurity.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,15 +11,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.util.Optional;
 
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
     CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    UsersRepository usersRepository;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -33,8 +35,10 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         UserDetails customUserDetails = null;
+        // get user email
+        Users userEmail = usersRepository.findByName(username).orElseThrow();
         try{
-            customUserDetails = customUserDetailsService.loadUserByEmail(username);
+            customUserDetails = customUserDetailsService.loadUserByUsername(userEmail.getEmail());
         }catch (UsernameNotFoundException e){
             throw new BadCredentialsException("Invalid user detail");
         }
